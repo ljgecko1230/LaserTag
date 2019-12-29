@@ -29,14 +29,6 @@ def start_game():
 def select_game_mode():
     pass
 
-def add_players():
-    while True:
-        player_name = input("Player Name (blank to exit): ")
-        if not player_name:
-            break
-
-        new_player = Player(player_name, len(players))
-
 def generate_teams():
     pass
 
@@ -46,14 +38,18 @@ def server_homepage():
 
 @app.route("/connect", methods=["POST"])
 def join_game():
+    player_data = eval(request.data.decode("utf-8"))
+    new_player = Player(player_data["name"], len(players))
+    players.append(new_player)
 
-    return "okay"
+    return {"id": new_player.id}
 
 @app.route("/shot", methods=["POST"])
 def sent_shot():
-    exec(request.data.decode("utf-8"))
-    return "okay"
+    shot_data = eval(request.data.decode("utf-8"))
+    return 1
 
 @app.route("/hit", methods=["POST"])
 def recieved_hit():
-    return "okay"
+    hit_data = eval(request.data.decode("utf-8"))
+    return 1
