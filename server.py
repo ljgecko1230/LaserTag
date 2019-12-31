@@ -4,52 +4,50 @@ app = Flask(__name__)
 
 players = []
 
-class GameMode():
-    def __init__(self):
-        pass
-
-class Player():
-    def __init__(self, name, id):
-        self.name = name
+class Player:
+    def __init__(self, id, codename):
         self.id = id
-        self.team = None
+        self.codename = codename
         self.health = 100
-        self.kills = 0
-        self.deaths = 0
+        self.score = 0
+        self.shots = []
+        self.hits_taken = []
+        self.hits_given = []
 
-class Weapon():
-    def __init__(self, id):
+class Weapon:
+    def __init__(self, type, magazine_capacity, max_ammo_storage, power,\
+                 fire_rate, reload_speed):
+        self.type = type
+        self.magazine_capacity = magazine_capacity
+        self.max_ammo_storage = max_ammo_storage
+        self.reload_speed = reload_speed
+        self.fire_rate = fire_rate
+        self.power = power
+
+class Event:
+    def __init__(self, id, time, player):
         self.id = id
+        self.time = time
+        self.player = player
 
-def start_game():
-    select_game_mode()
-    add_players()
-    generate_teams()
-
-def select_game_mode():
+class Shot(Event):
     pass
 
-def generate_teams():
+class Hit(Event):
     pass
 
-@app.route("/", methods=["GET"])
-def server_homepage():
+@app.route("/")
+def homepage():
     return render_template("home.html")
 
-@app.route("/connect", methods=["POST"])
-def join_game():
-    player_data = eval(request.data.decode("utf-8"))
-    new_player = Player(player_data["name"], len(players))
-    players.append(new_player)
+@app.route("/login")
+def login():
+    pass
 
-    return {"id": new_player.id}
+@app.route("/shot")
+def recieve_shot():
+    pass
 
-@app.route("/shot", methods=["POST"])
-def sent_shot():
-    shot_data = eval(request.data.decode("utf-8"))
-    return 1
-
-@app.route("/hit", methods=["POST"])
-def recieved_hit():
-    hit_data = eval(request.data.decode("utf-8"))
-    return 1
+@app.route("/hit")
+def recieve_hit():
+    pass
