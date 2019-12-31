@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 
 app = Flask(__name__)
 
@@ -40,9 +40,23 @@ class Hit(Event):
 def homepage():
     return render_template("home.html")
 
-@app.route("/login")
-def login():
-    pass
+@app.route("/connect", methods=["POST"])
+def connect():
+    print("Client attempting to connect...")
+    player_info = eval(request.data)
+    print("Player info: " + str(player_info))
+
+    new_player = Player(len(players), player_info["codename"])
+    players.append(new_player)
+
+    print("Player created.")
+
+    return_data = str({"id": new_player.id})
+    response = Response(return_data, status=200, mimetype="text/plain")
+
+    print("Returning client info (" + str(response) + ").")
+
+    return response
 
 @app.route("/shot")
 def recieve_shot():
