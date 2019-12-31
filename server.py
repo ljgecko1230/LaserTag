@@ -25,10 +25,12 @@ class Weapon:
         self.power = power
 
 class Event:
-    def __init__(self, id, time, player):
-        self.id = id
+    def __init__(self, time, player):
+        self.id = len(players[player].shots)
         self.time = time
-        self.player = player
+        self.player = players[player]
+
+        self.player.shots.append(self)
 
 class Shot(Event):
     pass
@@ -43,7 +45,9 @@ def homepage():
 @app.route("/connect", methods=["POST"])
 def connect():
     print("Client attempting to connect...")
+
     player_info = eval(request.data)
+
     print("Player info: " + str(player_info))
 
     new_player = Player(len(players), player_info["codename"])
@@ -60,7 +64,12 @@ def connect():
 
 @app.route("/shot")
 def recieve_shot():
-    pass
+    shot_data = eval(request.data)
+
+    print("Client (" + shot_data["id"] + ") sending shot...")
+    print("Shot info: " + str(shot_data))
+
+    new_shot = Shot(shot_data["time"], shot_data["player"])
 
 @app.route("/hit")
 def recieve_hit():
