@@ -2,7 +2,10 @@ from flask import Flask, render_template, request, Response
 
 app = Flask(__name__)
 
-players = []
+global players
+players = {}
+global next_available_id
+next_available_id = 0
 
 class Player:
     def __init__(self, id, codename):
@@ -38,39 +41,68 @@ class Shot(Event):
 class Hit(Event):
     pass
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def homepage():
-    return render_template("home.html")
+    player_list = [" - " + str(id) + ": " + str(player.codename)\
+                           for id, player in players.items()]
+
+    return render_template("home.html", player_list=player_list)
 
 @app.route("/connect", methods=["POST"])
 def connect():
+    global players
+    global next_available_id
+
+    print()
     print("Client attempting to connect...")
 
-    player_info = eval(request.data)
+    player_data = eval(request.data)
 
-    print("Player info: " + str(player_info))
+    print("Player info: " + str(player_data))
 
-    new_player = Player(len(players), player_info["codename"])
-    players.append(new_player)
+    new_player = Player(next_available_id, player_data["codename"])
+    players[new_player.id] = new_player
+    next_available_id += 1
 
     print("Player created.")
 
     return_data = str({"id": new_player.id})
     response = Response(return_data, status=200, mimetype="text/plain")
 
-    print("Returning client info (" + str(response) + ").")
+    print("Returning response (" + str(response) + ").")
 
     return response
 
-@app.route("/shot")
-def recieve_shot():
-    shot_data = eval(request.data)
-
-    print("Client (" + shot_data["id"] + ") sending shot...")
-    print("Shot info: " + str(shot_data))
-
-    new_shot = Shot(shot_data["time"], shot_data["player"])
-
-@app.route("/hit")
-def recieve_hit():
+@app.route("/shot", methods=["POST"])
+def recieve_attack_data():
     pass
+
+@app.route("/hit", methods=["POST"])
+def recieve_hit_data():
+    pass
+
+@app.route("/stats/<player_id>", methods=["GET"])
+def get_player_stats(player_id):
+    print()
+    print("Client requesting information...")
+    print("Player ID: " + str(player_id))
+
+    player_id = int(player_id)
+    try:
+        player = players[player_id]
+
+        print("Player found. Generating response...")
+
+        return_data = str({"id": player.id, "codename": player.codename,\
+                           "health": player.health, "score": player.score,\
+                           "shots": player.shots, "hits_taken": player.hits_taken,\
+                           "hits_given": player.hits_given})
+        response = Response(return_data, status=200, mimetype="text/plain")
+    except:
+        print("Player not found. Alerting client...")
+
+        response = Response(status=404)
+
+    print("Returning response (" + str(response) + ").")
+
+    return response

@@ -6,6 +6,10 @@
 <body>
   <h1 class="title">Laser Tag Server</h1>
   <h1 class="statistic">Connected Weapons: 0</h1>
-  <h1 class="statistic">Connected Players: 0</h1>
+  <h1 class="statistic">Connected Players: {{ player_list|length }}</h1>
+  <h1 class="statistic">List of Players:</h1>
+  {% for player in range(player_list|length) %}
+    <h1 class="statistic_item">{{ player_list[player] }}</h1>
+  {% endfor %}
 </body>
 </html>
