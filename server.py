@@ -33,8 +33,6 @@ class Event:
         self.time = time
         self.player = players[player]
 
-        self.player.shots.append(self)
-
 class Shot(Event):
     pass
 
@@ -43,6 +41,8 @@ class Hit(Event):
 
 @app.route("/", methods=["GET"])
 def homepage():
+    print()
+    print("Loading homepage...")
     player_list = [" - " + str(id) + ": " + str(player.codename)\
                            for id, player in players.items()]
 
@@ -75,11 +75,37 @@ def connect():
 
 @app.route("/shot", methods=["POST"])
 def recieve_attack_data():
-    pass
+    print()
+    print("Client sending shot...")
+
+    attack_data = eval(request.data)
+    new_shot = Shot(attack_data["time"], attack_data["player"])
+
+    print("Shot created.")
+
+    new_shot.player.shots.append(new_shot)
+
+    response = Response(status=200)
+
+    print("Returning response (" + str(response) + ").")
+
+    return response
 
 @app.route("/hit", methods=["POST"])
 def recieve_hit_data():
-    pass
+    print()
+    print("Client sending hit...")
+
+    hit_data = eval(request.data)
+    new_hit = Hit(hit_data["time"], hit_data["player"])
+
+    print("Hit created.")
+
+    response = Response(status=200)
+
+    print("Returning response (" + str(response) + ").")
+
+    return response
 
 @app.route("/stats/<player_id>", methods=["GET"])
 def get_player_stats(player_id):
@@ -94,9 +120,8 @@ def get_player_stats(player_id):
         print("Player found. Generating response...")
 
         return_data = str({"id": player.id, "codename": player.codename,\
-                           "health": player.health, "score": player.score,\
-                           "shots": player.shots, "hits_taken": player.hits_taken,\
-                           "hits_given": player.hits_given})
+                           "health": player.health, "score": player.score})
+
         response = Response(return_data, status=200, mimetype="text/plain")
     except:
         print("Player not found. Alerting client...")

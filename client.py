@@ -1,4 +1,5 @@
 import requests
+import time
 import sys
 
 server_url = "http://localhost:5000/"
@@ -17,7 +18,12 @@ def connect():
     return return_data
 
 def send_attack():
-    pass
+    print("Sending shot...")
+
+    shot_data = str({"time": time.time(), "player": id})
+    requests.post(server_url + "shot", data=shot_data)
+
+    print("Shot sent.")
 
 def recieve_attack():
     pass
@@ -36,20 +42,18 @@ while True:
     print()
     print("SERVER URL: " + server_url)
     print("CODENAME: " + codename)
-    if id:
+    if id != None:
         print("CLIENT ID: " + str(id))
         print("HEALTH: " + str(current_stats["health"]))
         print("SCORE: " + str(current_stats["score"]))
-        print("SHOTS: " + str(current_stats["shots"]))
-        print("HITS (TAKEN): " + str(current_stats["hits_taken"]))
-        print("HITS (GIVEN): " + str(current_stats["hits_given"]))
         print("1. Shoot")
         print("2. Take hit")
         print("3. Disconnect")
         choice = input("Choice: ")
 
         if choice == "1":
-            print("pew. choice not available at this time.")
+            send_attack()
+            get_player_stats()
 
         elif choice == "2":
             print("ouch. choice not available at this time.")
@@ -66,7 +70,8 @@ while True:
         choice = input("Choice: ")
 
         if choice == "1":
-            id = connect()["id"]
+            player_data = connect()
+            id = player_data["id"]
             current_stats = get_player_stats()
 
         elif choice == "2":
